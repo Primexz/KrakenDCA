@@ -11,7 +11,7 @@ var (
 	KrakenPrivateKey string
 	Currency         string
 	KrakenOrderSize  float64
-	CheckDelay   float64
+	CheckDelay       float64
 	CryptoPrefix     string
 	FiatPrefix       string
 )

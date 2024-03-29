@@ -14,6 +14,11 @@ var (
 		Name: "fiat_amount",
 		Help: "Current fiat amount",
 	})
+
+	ExpectedOrderCnt = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "expected_orders_until_refill",
+		Help: "Expected order count",
+	})
 )
 
 func StartServer() {

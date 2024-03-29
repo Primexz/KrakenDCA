@@ -31,9 +31,7 @@ func StartBot() {
 }
 
 func run() {
-	// fiatBalance := kraken.GetFiatBalance()
-	kraken.GetFiatBalance()
-	fiatAmount = 1000
+	fiatAmount = kraken.GetFiatBalance()
 	prometheus.MetricFiatAmount.Set(fiatAmount)
 
 	if fiatAmount == 0 {
@@ -53,8 +51,8 @@ func run() {
 	lastBtcFiatPrice = kraken.GetCurrentBtcFiatPrice()
 
 	if timeOfNextOrder.Before(time.Now()) || newFiatMoney {
-		log.Println("Placing order..")
-		//kraken.BuyBtc()
+		log.Println("Placing bitcoin purchase order..")
+		kraken.BuyBtc()
 
 		calculateTimeOfNextOrder()
 	}
@@ -67,6 +65,9 @@ func run() {
 func calculateTimeOfNextOrder() {
 	fiatValueInBtc := fiatAmount / lastBtcFiatPrice
 	orderAmountUntilRefill := fiatValueInBtc / config.KrakenOrderSize
+
+	prometheus.ExpectedOrderCnt.Set(orderAmountUntilRefill)
+	log.Println("Expected orders this month", orderAmountUntilRefill)
 
 	now := time.Now().UnixMilli()
 	timeOfNextOrder = time.UnixMilli((timeOfEmptyFiat.UnixMilli()-now)/int64(orderAmountUntilRefill) + now)
