@@ -19,6 +19,16 @@ var (
 		Name: "expected_orders_until_refill",
 		Help: "Expected order count",
 	})
+
+	NextOrderTime = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "next_order_time",
+		Help: "Time of next order",
+	})
+
+	TimeOfEmptyFiat = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "time_of_empty_fiat",
+		Help: "Time of empty fiat",
+	})
 )
 
 func StartServer() {

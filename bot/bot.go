@@ -41,6 +41,8 @@ func run() {
 
 	newFiatMoney := fiatAmount > lastFiatBalance
 	if newFiatMoney || initialRun {
+		log.Println("New fiat deposit found. 💰")
+
 		timeOfEmptyFiat = computeNextFiatDepositDay()
 
 		log.Println("Next Fiat deposit required at", timeOfEmptyFiat)
@@ -50,7 +52,9 @@ func run() {
 
 	lastBtcFiatPrice = kraken.GetCurrentBtcFiatPrice()
 
-	if timeOfNextOrder.Before(time.Now()) || newFiatMoney {
+	if initialRun {
+		calculateTimeOfNextOrder()
+	} else if timeOfNextOrder.Before(time.Now()) || newFiatMoney {
 		log.Println("Placing bitcoin purchase order..")
 		kraken.BuyBtc()
 
@@ -58,8 +62,6 @@ func run() {
 	}
 
 	log.Println("Next order in", fmtDuration(time.Until(timeOfNextOrder)), timeOfNextOrder)
-
-	//TODO: ADD AUTO WITHDRAWAL
 }
 
 func calculateTimeOfNextOrder() {
@@ -71,6 +73,9 @@ func calculateTimeOfNextOrder() {
 
 	now := time.Now().UnixMilli()
 	timeOfNextOrder = time.UnixMilli((timeOfEmptyFiat.UnixMilli()-now)/int64(orderAmountUntilRefill) + now)
+
+	//set metrics
+	prometheus.NextOrderTime.Set(float64(timeOfNextOrder.UnixMilli()))
 }
 
 func updateFiatBalance(fiat float64) {
