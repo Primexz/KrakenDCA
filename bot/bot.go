@@ -41,7 +41,11 @@ func run() {
 
 	newFiatMoney := fiatAmount > lastFiatBalance
 	if newFiatMoney || initialRun {
-		log.Println("New fiat deposit found. 💰")
+		if initialRun {
+			log.Println("Initial run. Calculating next fiat deposit day..")
+		} else {
+			log.Println("New fiat deposit found. 💰")
+		}
 
 		timeOfEmptyFiat = computeNextFiatDepositDay()
 
@@ -53,8 +57,8 @@ func run() {
 	lastBtcFiatPrice = kraken.GetCurrentBtcFiatPrice()
 	calculateTimeOfNextOrder()
 
-	if timeOfNextOrder.Before(time.Now()) || newFiatMoney {
-		log.Println("Placing bitcoin purchase order..")
+	if (timeOfNextOrder.Before(time.Now()) || newFiatMoney) && !initialRun {
+		log.Println("Placing bitcoin purchase order. ₿")
 		kraken.BuyBtc()
 	}
 
@@ -66,7 +70,6 @@ func calculateTimeOfNextOrder() {
 	orderAmountUntilRefill := fiatValueInBtc / config.KrakenOrderSize
 
 	prometheus.ExpectedOrderCnt.Set(orderAmountUntilRefill)
-	log.Println("Expected orders this month", orderAmountUntilRefill)
 
 	now := time.Now().UnixMilli()
 	timeOfNextOrder = time.UnixMilli((timeOfEmptyFiat.UnixMilli()-now)/int64(orderAmountUntilRefill) + now)
