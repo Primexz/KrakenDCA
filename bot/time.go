@@ -11,7 +11,7 @@ func computeNextFiatDepositDay() time.Time {
 	date := addMonthsToTime(1, time.Now().UTC())
 
 	//set metrics
-	prometheus.TimeOfEmptyFiat.Set(float64(date.Unix()))
+	prometheus.TimeOfEmptyFiat.Set(float64(date.UnixMilli()))
 
 	return date
 }

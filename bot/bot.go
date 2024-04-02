@@ -51,14 +51,11 @@ func run() {
 	}
 
 	lastBtcFiatPrice = kraken.GetCurrentBtcFiatPrice()
+	calculateTimeOfNextOrder()
 
-	if initialRun {
-		calculateTimeOfNextOrder()
-	} else if timeOfNextOrder.Before(time.Now()) || newFiatMoney {
+	if timeOfNextOrder.Before(time.Now()) || newFiatMoney {
 		log.Println("Placing bitcoin purchase order..")
 		kraken.BuyBtc()
-
-		calculateTimeOfNextOrder()
 	}
 
 	log.Println("Next order in", fmtDuration(time.Until(timeOfNextOrder)), timeOfNextOrder)
