@@ -3,17 +3,13 @@ package bot
 import (
 	"fmt"
 	"time"
-
-	"github.com/primexz/KrakenDCA/prometheus"
 )
 
 func computeNextFiatDepositDay() time.Time {
-	date := addMonthsToTime(1, time.Now().UTC())
+	date := addMonthsToTime(1, time.Now())
 
-	//set metrics
-	prometheus.TimeOfEmptyFiat.Set(float64(date.UnixMilli()))
-
-	return date
+	//get the first day of the month
+	return date.AddDate(0, 0, -date.Day()+1)
 }
 
 func addMonthsToTime(months int, time time.Time) time.Time {
