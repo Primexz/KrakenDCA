@@ -2,6 +2,7 @@ package kraken
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/aopoltorzhicky/go_kraken/rest"
 	"github.com/primexz/KrakenDCA/config"
+	"github.com/primexz/KrakenDCA/notification"
 )
 
 type KrakenSpread struct {
@@ -54,6 +56,12 @@ func BuyBtc() {
 		log.Println("Failed to buy btc", err.Error())
 		return
 	}
+
+	notification.SendPushNotification("BTC bought", fmt.Sprintf(`
+Description: %s
+Price: %f
+Transaction IDs: %+q
+`, response.Description.Info, GetCurrentBtcFiatPrice(), response.TransactionIds))
 
 	log.Println("Successfully bought btc ->", response.Description.Info, response.Description.Price)
 }
