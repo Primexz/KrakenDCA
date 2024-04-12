@@ -51,17 +51,15 @@ func GetCurrentBtcFiatPrice() float64 {
 }
 
 func BuyBtc() {
-	response, err := getApi().AddOrder("xbt"+strings.ToLower(config.Currency), "buy", "market", config.KrakenOrderSize, nil)
+	currency := config.Currency
+
+	response, err := getApi().AddOrder("xbt"+strings.ToLower(currency), "buy", "market", config.KrakenOrderSize, nil)
 	if err != nil {
 		log.Println("Failed to buy btc", err.Error())
 		return
 	}
 
-	notification.SendPushNotification("BTC bought", fmt.Sprintf(`
-Description: %s
-Price: %f
-Transaction IDs: %+q
-`, response.Description.Info, GetCurrentBtcFiatPrice(), response.TransactionIds))
+	notification.SendPushNotification("BTC bought", fmt.Sprintf("Description: %s\nPrice: %f %s", response.Description.Info, GetCurrentBtcFiatPrice(), currency))
 
 	log.Println("Successfully bought btc ->", response.Description.Info, response.Description.Price)
 }
