@@ -6,7 +6,6 @@ import (
 
 	"github.com/primexz/KrakenDCA/config"
 	"github.com/primexz/KrakenDCA/kraken"
-	"github.com/primexz/KrakenDCA/prometheus"
 )
 
 var (
@@ -32,7 +31,6 @@ func StartBot() {
 
 func run() {
 	fiatAmount = kraken.GetFiatBalance()
-	prometheus.MetricFiatAmount.Set(fiatAmount)
 
 	if fiatAmount == 0 {
 		log.Println("No remaining fiat balance found. It's time to top up your account ;)")
@@ -74,13 +72,9 @@ func calculateTimeOfNextOrder() {
 	fiatValueInBtc := fiatAmount / lastBtcFiatPrice
 	orderAmountUntilRefill := fiatValueInBtc / config.KrakenOrderSize
 
-	prometheus.ExpectedOrderCnt.Set(orderAmountUntilRefill)
 
 	now := time.Now().UnixMilli()
 	timeOfNextOrder = time.UnixMilli((timeOfEmptyFiat.UnixMilli()-now)/int64(orderAmountUntilRefill) + now)
-
-	//set metrics
-	prometheus.NextOrderTime.Set(float64(timeOfNextOrder.UnixMilli()))
 }
 
 func updateFiatBalance(fiat float64) {
