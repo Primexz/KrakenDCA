@@ -1,6 +1,6 @@
 module github.com/primexz/KrakenDCA
 
-go 1.22.1
+go 1.22
 
 require github.com/aopoltorzhicky/go_kraken/rest v0.0.4
 
