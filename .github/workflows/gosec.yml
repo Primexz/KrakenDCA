@@ -21,5 +21,4 @@ jobs:
 
       - name: Run Gosec Security Scanner
         run: |
-          cd radicalvpnd
           $(go env GOPATH)/bin/gosec ./...
