@@ -64,7 +64,6 @@ docker run -d --name kraken_dca \
 ### 🚀 Docker-Compose
 
 ```bash
-touch docker-compose.yml
 vim docker-compose.yml
 ```
 
