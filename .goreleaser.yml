@@ -27,3 +27,7 @@ docker_manifests:
   image_templates:
   - "ghcr.io/primexz/kraken_dca:{{ .Version }}-amd64"
   - "ghcr.io/primexz/kraken_dca:{{ .Version }}-arm64v8"
+- name_template: "ghcr.io/primexz/kraken_dca:latest"
+  image_templates:
+  - "ghcr.io/primexz/kraken_dca:{{ .Version }}-amd64"
+  - "ghcr.io/primexz/kraken_dca:{{ .Version }}-arm64v8"
