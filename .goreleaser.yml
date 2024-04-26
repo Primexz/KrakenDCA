@@ -1,0 +1,25 @@
+project_name: kraken-dca
+builds:
+  - goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm
+      - arm64
+    goarm:
+      - "6"
+      - "7"
+release:
+  draft: true
+snapshot:
+  name_template: "{{ .Version }}-{{.ShortCommit}}"
+checksum:
+  name_template: "{{ .ProjectName }}_checksums.txt"
+dockers:
+  - image_templates:
+      - "gcr.io/primexz/kraken_dca:{{ .Tag }}"
+      - "gcr.io/primexz/kraken_dca:latest"
+changelog:
+  use: github
+  sort: asc

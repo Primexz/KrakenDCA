@@ -49,7 +49,7 @@ func run() {
 
 		log.Println("Next Fiat deposit required at", timeOfEmptyFiat)
 
-		updateFiatBalance(fiatAmount)
+		lastFiatBalance = fiatAmount
 	}
 
 	lastBtcFiatPrice = kraken.GetCurrentBtcFiatPrice()
@@ -60,22 +60,11 @@ func run() {
 
 	if (timeOfNextOrder.Before(time.Now()) || newFiatMoney) && !initialRun {
 		log.Println("Placing bitcoin purchase order. ₿")
+
 		kraken.BuyBtc()
 
 		calculateTimeOfNextOrder()
 	}
 
 	log.Println("Next order in", fmtDuration(time.Until(timeOfNextOrder)), timeOfNextOrder)
-}
-
-func calculateTimeOfNextOrder() {
-	fiatValueInBtc := fiatAmount / lastBtcFiatPrice
-	orderAmountUntilRefill := fiatValueInBtc / config.KrakenOrderSize
-
-	now := time.Now().UnixMilli()
-	timeOfNextOrder = time.UnixMilli((timeOfEmptyFiat.UnixMilli()-now)/int64(orderAmountUntilRefill) + now)
-}
-
-func updateFiatBalance(fiat float64) {
-	lastFiatBalance = fiat
 }

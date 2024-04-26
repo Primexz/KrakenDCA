@@ -5,13 +5,6 @@ import (
 	"time"
 )
 
-func computeNextFiatDepositDay() time.Time {
-	date := addMonthsToTime(1, time.Now())
-
-	//get the first day of the month
-	return date.AddDate(0, 0, -date.Day()+1)
-}
-
 func addMonthsToTime(months int, time time.Time) time.Time {
 	return time.AddDate(0, months, 0)
 }
