@@ -72,7 +72,6 @@ func calculateTimeOfNextOrder() {
 	fiatValueInBtc := fiatAmount / lastBtcFiatPrice
 	orderAmountUntilRefill := fiatValueInBtc / config.KrakenOrderSize
 
-
 	now := time.Now().UnixMilli()
 	timeOfNextOrder = time.UnixMilli((timeOfEmptyFiat.UnixMilli()-now)/int64(orderAmountUntilRefill) + now)
 }
