@@ -21,7 +21,7 @@ func LoadConfiguration() {
 
 	KrakenPublicKey = loadRequiredEnvVariable("KRAKEN_PUBLIC_KEY")
 	KrakenPrivateKey = loadRequiredEnvVariable("KRAKEN_PRIVATE_KEY")
-	Currency = loadFallbackEnvVariable("❌", "USD")
+	Currency = loadFallbackEnvVariable("CURRENCY", "USD")
 	KrakenOrderSize = loadFloatEnvVariableWithFallback("KRAKEN_ORDER_SIZE", 0.0001) // https://support.kraken.com/hc/en-us/articles/205893708-Minimum-order-size-volume-for-trading
 	CheckDelay = loadFloatEnvVariableWithFallback("CHECK_DELAY", 60)
 
