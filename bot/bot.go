@@ -65,6 +65,4 @@ func run() {
 
 		calculateTimeOfNextOrder()
 	}
-
-	log.Println("Next order in", fmtDuration(time.Until(timeOfNextOrder)), timeOfNextOrder)
 }
