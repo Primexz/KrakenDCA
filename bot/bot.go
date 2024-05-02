@@ -18,8 +18,6 @@ var (
 )
 
 func StartBot() {
-	log.Println("Starting Kraken DCA Bot lifecycle..")
-
 	for {
 		run()
 
