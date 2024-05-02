@@ -56,13 +56,18 @@ func run() {
 
 	if initialRun {
 		calculateTimeOfNextOrder()
+		logNextOrder()
 	}
 
 	if (timeOfNextOrder.Before(time.Now()) || newFiatMoney) && !initialRun {
 		log.Println("Placing bitcoin purchase order. ₿")
 
 		kraken.BuyBtc()
-
 		calculateTimeOfNextOrder()
+		logNextOrder()
 	}
+}
+
+func logNextOrder() {
+	log.Println("Next order in", fmtDuration(time.Until(timeOfNextOrder)), timeOfNextOrder)
 }
