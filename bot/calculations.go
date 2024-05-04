@@ -13,21 +13,21 @@ func computeNextFiatDepositDay() time.Time {
 	return date.AddDate(0, 0, -date.Day()+1)
 }
 
-func calculateTimeOfNextOrder() {
-	orderAmountUntilRefill := getOrderAmountUntilRefill()
+func (b *Bot) calculateTimeOfNextOrder() {
+	orderAmountUntilRefill := b.getOrderAmountUntilRefill()
 
 	if orderAmountUntilRefill < 1 {
 		log.Error("Fiat balance is too low to make an order.")
-		timeOfNextOrder = timeOfEmptyFiat
+		b.timeOfNextOrder = b.timeOfEmptyFiat
 		return
 	}
 
 	now := time.Now().UnixMilli()
-	timeOfNextOrder = time.UnixMilli((timeOfEmptyFiat.UnixMilli()-now)/int64(orderAmountUntilRefill) + now)
+	b.timeOfNextOrder = time.UnixMilli((b.timeOfEmptyFiat.UnixMilli()-now)/int64(orderAmountUntilRefill) + now)
 }
 
-func getOrderAmountUntilRefill() float64 {
-	fiatValueInBtc := fiatAmount / lastBtcFiatPrice
+func (b *Bot) getOrderAmountUntilRefill() float64 {
+	fiatValueInBtc := b.fiatAmount / b.lastBtcFiatPrice
 
 	return fiatValueInBtc / config.KrakenOrderSize
 }
