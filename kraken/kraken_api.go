@@ -20,22 +20,22 @@ type KrakenSpread struct {
 	Last   int                    `json:"last"`
 }
 
-func GetCurrentBtcFiatPrice() float64 {
+func GetCurrentBtcFiatPrice() (float64, error) {
 	cryptoName := config.CryptoPrefix + "XBT" + config.FiatPrefix + config.Currency
 
 	resp, err := http.Get("https://api.kraken.com/0/public/Spread?pair=" + cryptoName)
 	if err != nil {
-		log.Fatal(err)
+		return 0, err
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		return 0, err
 	}
 
 	var result KrakenSpread
 	if err := json.Unmarshal(body, &result); err != nil {
-		log.Fatal(result)
+		return 0, err
 	}
 
 	prices := result.Result[cryptoName].([]interface{})
@@ -44,10 +44,10 @@ func GetCurrentBtcFiatPrice() float64 {
 
 	parsedPrice, err := strconv.ParseFloat(currentPrice.(string), 32)
 	if err != nil {
-		log.Fatal("failed to parse price", parsedPrice)
+		return 0, err
 	}
 
-	return parsedPrice
+	return parsedPrice, nil
 }
 
 func BuyBtc() {
@@ -59,7 +59,12 @@ func BuyBtc() {
 		return
 	}
 
-	notification.SendPushNotification("BTC bought", fmt.Sprintf("Description: %s\nPrice: %f %s", response.Description.Info, GetCurrentBtcFiatPrice(), currency))
+	fiatPrice, err := GetCurrentBtcFiatPrice()
+	if err != nil {
+		log.Println("Failed to get current btc price", err.Error())
+	}
+
+	notification.SendPushNotification("BTC bought", fmt.Sprintf("Description: %s\nPrice: %f %s", response.Description.Info, fiatPrice, currency))
 
 	log.Println("Successfully bought btc ->", response.Description.Info, response.Description.Price)
 }

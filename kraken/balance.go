@@ -1,12 +1,12 @@
 package kraken
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/primexz/KrakenDCA/config"
 )
 
-func GetFiatBalance() float64 {
+func GetFiatBalance() (float64, error) {
 	var balanceKey string
 	if config.Currency == "AUD" {
 		balanceKey = "Z"
@@ -17,21 +17,17 @@ func GetFiatBalance() float64 {
 	return getKrakenBalance(balanceKey)
 }
 
-func GetBtcAmount() float64 {
-	return getKrakenBalance("XXBT")
-}
-
-func getKrakenBalance(currency string) float64 {
+func getKrakenBalance(currency string) (float64, error) {
 	balances, err := getApi().GetAccountBalances()
 	if err != nil {
-		log.Fatalln("failed to query account balance")
+		return 0, err
 	}
 
 	balance, ok := balances[currency]
 	if !ok {
-		log.Fatalln("Failed to get balance for", currency)
+		return 0, fmt.Errorf("no balance found for currency %s", currency)
 	}
 
 	ret, _ := balance.Float64()
-	return ret
+	return ret, nil
 }

@@ -1,11 +1,11 @@
 package bot
 
 import (
-	"log"
 	"time"
 
 	"github.com/primexz/KrakenDCA/config"
 	"github.com/primexz/KrakenDCA/kraken"
+	"github.com/primexz/KrakenDCA/logger"
 )
 
 var (
@@ -27,30 +27,48 @@ func StartBot() {
 
 }
 
+var log *logger.Logger
+
+func init() {
+	log = logger.NewLogger("bot")
+}
+
 func run() {
-	fiatAmount = kraken.GetFiatBalance()
+	log.Info("Starting bot")
+
+	if fiatAmnt, err := kraken.GetFiatBalance(); err == nil {
+		fiatAmount = fiatAmnt
+	} else {
+		log.Error("Error getting fiat balance: ", err)
+		return
+	}
 
 	if fiatAmount == 0 {
-		log.Println("No remaining fiat balance found. It's time to top up your account ;)")
+		log.Warn("No remaining fiat balance found. It's time to top up your account ;)")
 		return
 	}
 
 	newFiatMoney := fiatAmount > lastFiatBalance
 	if newFiatMoney || initialRun {
 		if initialRun {
-			log.Println("Initial run. Calculating next fiat deposit day..")
+			log.Info("Initial run. Calculating next fiat deposit day..")
 		} else {
-			log.Println("New fiat deposit found. 💰")
+			log.Info("New fiat deposit found. 💰")
 		}
 
 		timeOfEmptyFiat = computeNextFiatDepositDay()
 
-		log.Println("Next Fiat deposit required at", timeOfEmptyFiat)
+		log.Info("Next Fiat deposit required at", timeOfEmptyFiat)
 
 		lastFiatBalance = fiatAmount
 	}
 
-	lastBtcFiatPrice = kraken.GetCurrentBtcFiatPrice()
+	if fiatPrice, err := kraken.GetCurrentBtcFiatPrice(); err == nil {
+		lastBtcFiatPrice = fiatPrice
+	} else {
+		log.Error("Error getting current btc price:", err)
+		return
+	}
 
 	if initialRun {
 		calculateTimeOfNextOrder()
@@ -58,7 +76,7 @@ func run() {
 	}
 
 	if (timeOfNextOrder.Before(time.Now()) || newFiatMoney) && !initialRun {
-		log.Println("Placing bitcoin purchase order. ₿")
+		log.Info("Placing bitcoin purchase order. ₿")
 
 		kraken.BuyBtc()
 		calculateTimeOfNextOrder()
@@ -67,5 +85,5 @@ func run() {
 }
 
 func logNextOrder() {
-	log.Println("Next order in", fmtDuration(time.Until(timeOfNextOrder)), timeOfNextOrder)
+	log.Info("Next order in", fmtDuration(time.Until(timeOfNextOrder)), timeOfNextOrder)
 }

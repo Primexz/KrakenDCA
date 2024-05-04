@@ -1,7 +1,6 @@
 package bot
 
 import (
-	"log"
 	"time"
 
 	"github.com/primexz/KrakenDCA/config"
@@ -18,7 +17,7 @@ func calculateTimeOfNextOrder() {
 	orderAmountUntilRefill := getOrderAmountUntilRefill()
 
 	if orderAmountUntilRefill < 1 {
-		log.Println("Fiat balance is too low to make an order.")
+		log.Error("Fiat balance is too low to make an order.")
 		timeOfNextOrder = timeOfEmptyFiat
 		return
 	}

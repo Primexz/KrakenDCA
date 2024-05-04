@@ -1,9 +1,10 @@
 package config
 
 import (
-	"log"
 	"os"
 	"strconv"
+
+	"github.com/primexz/KrakenDCA/logger"
 )
 
 var (
@@ -16,8 +17,14 @@ var (
 	FiatPrefix       string
 )
 
+var log *logger.Logger
+
+func init() {
+	log = logger.NewLogger("config")
+}
+
 func LoadConfiguration() {
-	log.Println("Loading configuration..")
+	log.Info("Loading configuration..")
 
 	KrakenPublicKey = loadRequiredEnvVariable("KRAKEN_PUBLIC_KEY")
 	KrakenPrivateKey = loadRequiredEnvVariable("KRAKEN_PRIVATE_KEY")
@@ -35,7 +42,7 @@ func loadRequiredEnvVariable(envVar string) string {
 	envData := os.Getenv(envVar)
 
 	if envData == "" {
-		log.Fatalln("Required environment variable", envVar, "missing.")
+		log.Fatal("Required environment variable", envVar, "missing.")
 	}
 
 	return envData
@@ -58,7 +65,7 @@ func loadFloatEnvVariableWithFallback(envVar string, fallback float64) float64 {
 	} else if s, err := strconv.ParseFloat(envData, 32); err == nil {
 		return s
 	} else {
-		log.Fatalln("Failed to parse float environment variable.")
+		log.Fatal("Failed to parse float environment variable.")
 	}
 
 	return fallback
