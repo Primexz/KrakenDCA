@@ -31,6 +31,7 @@ func init() {
 
 func (b *Bot) StartBot() {
 	go func() {
+		log.Info("Starting bot")
 
 		for {
 			b.run()
@@ -43,8 +44,6 @@ func (b *Bot) StartBot() {
 }
 
 func (b *Bot) run() {
-	log.Info("Starting bot")
-
 	if fiatAmnt, err := kraken.GetFiatBalance(); err == nil {
 		b.fiatAmount = fiatAmnt
 	} else {
