@@ -3,11 +3,18 @@ package notification
 import (
 	"bytes"
 	"encoding/json"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
+
+	"github.com/primexz/KrakenDCA/logger"
 )
+
+var log *logger.Logger
+
+func init() {
+	log = logger.NewLogger("gotify")
+}
 
 type GotifyMessage struct {
 	Title    string `json:"title"`
@@ -20,7 +27,7 @@ func SendPushNotification(title string, messageText string) {
 	rawUrl := os.Getenv("GOTIFY_URL")
 
 	if appToken == "" || rawUrl == "" {
-		log.Println("Skip sending push notification, not configured")
+		log.Debug("Skip sending push notification, not configured")
 		return
 	}
 
@@ -42,17 +49,17 @@ func SendPushNotification(title string, messageText string) {
 
 	bodyBytes, err := json.Marshal(message)
 	if err != nil {
-		log.Println(err)
+		log.Error(err)
 	}
 
 	reader := bytes.NewReader(bodyBytes)
 	rsp, err := http.Post(reqUrl.String(), "application/json", reader)
 
 	if err != nil {
-		log.Println("failed to send push notification", err)
+		log.Error("failed to send push notification", err)
 	}
 
 	if rsp.StatusCode != 200 {
-		log.Println("failed to send push notification, status code", rsp.StatusCode)
+		log.Error("failed to send push notification, status code", rsp.StatusCode)
 	}
 }

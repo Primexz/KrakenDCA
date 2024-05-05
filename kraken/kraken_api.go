@@ -4,15 +4,21 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/aopoltorzhicky/go_kraken/rest"
 	"github.com/primexz/KrakenDCA/config"
+	"github.com/primexz/KrakenDCA/logger"
 	"github.com/primexz/KrakenDCA/notification"
 )
+
+var log *logger.Logger
+
+func init() {
+	log = logger.NewLogger("kraken_api")
+}
 
 type KrakenSpread struct {
 	Error  []interface{}          `json:"error"`
@@ -55,18 +61,18 @@ func BuyBtc() {
 
 	response, err := getApi().AddOrder("xbt"+strings.ToLower(currency), "buy", "market", config.KrakenOrderSize, nil)
 	if err != nil {
-		log.Println("Failed to buy btc", err.Error())
+		log.Error("Failed to buy btc", err.Error())
 		return
 	}
 
 	fiatPrice, err := GetCurrentBtcFiatPrice()
 	if err != nil {
-		log.Println("Failed to get current btc price", err.Error())
+		log.Error("Failed to get current btc price", err.Error())
 	}
 
 	notification.SendPushNotification("BTC bought", fmt.Sprintf("Description: %s\nPrice: %f %s", response.Description.Info, fiatPrice, currency))
 
-	log.Println("Successfully bought btc ->", response.Description.Info, response.Description.Price)
+	log.Info("Successfully bought btc ->", response.Description.Info, response.Description.Price)
 }
 
 func getApi() *rest.Kraken {
