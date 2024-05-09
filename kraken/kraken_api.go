@@ -78,10 +78,10 @@ func BuyBtc() {
 			"validate": false,
 
 			//price can only be specified up to 1 decimals
-			"price":       priceRound - 0.2,
+			"price":       priceRound - 0.1,
 			"oflags":      "post",
 			"timeinforce": "GTD",
-			"expiretm":    "+120", // close order after 2 minutes
+			"expiretm":    "+240", // close order after 4 minutes
 		}
 
 		log.Debug("Buying btc with price ", args["price"])
