@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/aopoltorzhicky/go_kraken/rest"
 	"github.com/primexz/KrakenDCA/config"
@@ -56,7 +57,12 @@ func GetCurrentBtcFiatPrice() (float64, error) {
 	return parsedPrice, nil
 }
 
-func BuyBtc() {
+func BuyBtc(_retry_do_not_use int) {
+	if _retry_do_not_use > 3 {
+		log.Error("Failed to buy btc after 3 retries, stop recursion")
+		return
+	}
+
 	currency := config.Currency
 
 	fiatPrice, err := GetCurrentBtcFiatPrice()
@@ -87,13 +93,66 @@ func BuyBtc() {
 		log.Debug("Buying btc with price ", args["price"])
 
 		response, krakenErr = getApi().AddOrder("xbt"+strings.ToLower(currency), "buy", "limit", config.KrakenOrderSize, args)
+		if krakenErr != nil {
+			log.Error("Failed to buy btc", krakenErr.Error())
+			return
+		}
+
+		transactionId := response.TransactionIds[0]
+
+		for {
+			orderInfo, err := getApi().QueryOrders(true, "", transactionId)
+			if err != nil {
+				log.Error("Failed to get order status", err.Error())
+				return
+			}
+
+			order, ok := orderInfo[transactionId]
+			if !ok {
+				log.Error("Failed to query order status")
+				return
+			}
+
+			orderStatus := order.Status
+			log.Info("current order status:", orderStatus)
+
+			if orderStatus == "closed" {
+				log.Info("Order successfully executed")
+				break
+			}
+
+			if orderStatus == "canceled" && order.Reason == "User requested" {
+				log.Info("Order canceled by user")
+				break
+			}
+
+			if orderStatus == "canceled" {
+				log.Info("Unknown reason for order cancelation.")
+				break
+			}
+
+			if orderStatus == "canceled" && order.Reason == "Post only order" {
+				log.Info("Order canceled by kraken due to post only order, retrying with new order")
+				BuyBtc(_retry_do_not_use + 1)
+				return
+			}
+
+			if orderStatus == "expired" {
+				log.Info("Order expired, retrying with new order")
+				BuyBtc(_retry_do_not_use + 1)
+				return
+			}
+
+			//wait on pending, open
+			time.Sleep(5 * time.Second)
+		}
+
 	} else {
 		response, krakenErr = getApi().AddOrder("xbt"+strings.ToLower(currency), "buy", "market", config.KrakenOrderSize, nil)
-	}
-
-	if krakenErr != nil {
-		log.Error("Failed to buy btc", krakenErr.Error())
-		return
+		if krakenErr != nil {
+			log.Error("Failed to buy btc", krakenErr.Error())
+			return
+		}
 	}
 
 	notification.SendPushNotification("BTC bought", fmt.Sprintf("Description: %s\nPrice: %f %s", response.Description.Info, fiatPrice, currency))
