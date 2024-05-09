@@ -37,7 +37,8 @@ This tool is configured via environment variables. Some environment variables ar
 | `KRAKEN_PUBLIC_KEY` | Your Kraken API public key | ✅ | |
 | `KRAKEN_PRIVATE_KEY` | Your Kraken API private key | ✅ | |
 | `CURRENCY` | Your fiat currency to be used, e.g. USD or EUR | ❌  | `USD` |
-| `KRAKEN_ORDER_SIZE` | The order size to be used. This value should only be edited if you know exactly what you are doing.r | ❌ | `0.0001` |
+| `KRAKEN_ORDER_SIZE` | The order size to be used. This value should only be edited if you know exactly what you are doing. | ❌ | `0.0001` |
+| `EXPERIMENTAL_MAKER_FEE` | If set to true, maker orders are placed, saving fees. **Warning: This function is experimental.** | ❌ | `false` |
 | `CHECK_DELAY` | How often the algorithm should be executed, in seconds. | ❌ | `60` |
 | `GOTIFY_URL` | URL to your Gotify server | ❌ |  |
 | `GOTIFY_APP_TOKEN` | App token for the app on the Gotify server | ❌ |  |

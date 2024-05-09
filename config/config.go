@@ -8,13 +8,14 @@ import (
 )
 
 var (
-	KrakenPublicKey  string
-	KrakenPrivateKey string
-	Currency         string
-	KrakenOrderSize  float64
-	CheckDelay       float64
-	CryptoPrefix     string
-	FiatPrefix       string
+	KrakenPublicKey      string
+	KrakenPrivateKey     string
+	Currency             string
+	KrakenOrderSize      float64
+	CheckDelay           float64
+	CryptoPrefix         string
+	FiatPrefix           string
+	ExperimentalMakerFee bool
 )
 
 var log *logger.Logger
@@ -31,6 +32,7 @@ func LoadConfiguration() {
 	Currency = loadFallbackEnvVariable("CURRENCY", "USD")
 	KrakenOrderSize = loadFloatEnvVariableWithFallback("KRAKEN_ORDER_SIZE", 0.0001) // https://support.kraken.com/hc/en-us/articles/205893708-Minimum-order-size-volume-for-trading
 	CheckDelay = loadFloatEnvVariableWithFallback("CHECK_DELAY", 60)
+	ExperimentalMakerFee = loadBoolEnvVariableWithFallback("EXPERIMENTAL_MAKER_FEE", false)
 
 	if Currency == "USD" || Currency == "EUR" || Currency == "GBP" {
 		CryptoPrefix = "X"
@@ -65,7 +67,20 @@ func loadFloatEnvVariableWithFallback(envVar string, fallback float64) float64 {
 	} else if s, err := strconv.ParseFloat(envData, 32); err == nil {
 		return s
 	} else {
-		log.Fatal("Failed to parse float environment variable.")
+		log.Fatal("Failed to parse float environment variable.", envVar)
+	}
+
+	return fallback
+}
+
+func loadBoolEnvVariableWithFallback(envVar string, fallback bool) bool {
+	envData := os.Getenv(envVar)
+
+	if envData == "" {
+	} else if s, err := strconv.ParseBool(envData); err == nil {
+		return s
+	} else {
+		log.Fatal("Failed to parse bool environment variable.", envVar)
 	}
 
 	return fallback

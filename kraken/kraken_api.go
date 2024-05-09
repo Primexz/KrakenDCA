@@ -59,15 +59,41 @@ func GetCurrentBtcFiatPrice() (float64, error) {
 func BuyBtc() {
 	currency := config.Currency
 
-	response, err := getApi().AddOrder("xbt"+strings.ToLower(currency), "buy", "market", config.KrakenOrderSize, nil)
-	if err != nil {
-		log.Error("Failed to buy btc", err.Error())
-		return
-	}
-
 	fiatPrice, err := GetCurrentBtcFiatPrice()
 	if err != nil {
 		log.Error("Failed to get current btc price", err.Error())
+	}
+
+	var (
+		response  rest.AddOrderResponse
+		krakenErr error
+	)
+
+	if config.ExperimentalMakerFee {
+		log.Warn("Buying btc with experimental maker fee. This may not work as expected.")
+
+		priceRound, _ := strconv.ParseFloat(fmt.Sprintf("%.1f", fiatPrice), 64)
+		args := map[string]interface{}{
+			// if set to true, no order will be submitted
+			"validate": false,
+
+			//price can only be specified up to 1 decimals
+			"price":       priceRound - 0.2,
+			"oflags":      "post",
+			"timeinforce": "GTD",
+			"expiretm":    "+120", // close order after 2 minutes
+		}
+
+		log.Debug("Buying btc with price ", args["price"])
+
+		response, krakenErr = getApi().AddOrder("xbt"+strings.ToLower(currency), "buy", "limit", config.KrakenOrderSize, args)
+	} else {
+		// response, krakenErr = getApi().AddOrder("xbt"+strings.ToLower(currency), "buy", "market", config.KrakenOrderSize, nil)
+	}
+
+	if krakenErr != nil {
+		log.Error("Failed to buy btc", krakenErr.Error())
+		return
 	}
 
 	notification.SendPushNotification("BTC bought", fmt.Sprintf("Description: %s\nPrice: %f %s", response.Description.Info, fiatPrice, currency))
