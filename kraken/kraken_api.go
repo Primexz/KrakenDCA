@@ -88,7 +88,7 @@ func BuyBtc() {
 
 		response, krakenErr = getApi().AddOrder("xbt"+strings.ToLower(currency), "buy", "limit", config.KrakenOrderSize, args)
 	} else {
-		// response, krakenErr = getApi().AddOrder("xbt"+strings.ToLower(currency), "buy", "market", config.KrakenOrderSize, nil)
+		response, krakenErr = getApi().AddOrder("xbt"+strings.ToLower(currency), "buy", "market", config.KrakenOrderSize, nil)
 	}
 
 	if krakenErr != nil {
