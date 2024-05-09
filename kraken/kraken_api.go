@@ -116,17 +116,17 @@ func BuyBtc(_retry_do_not_use int) {
 
 			if orderStatus == "closed" {
 				log.Info("Order successfully executed")
-				break
+				break // don't return to send notification and log
 			}
 
 			if orderStatus == "canceled" && order.Reason == "User requested" {
 				log.Info("Order canceled by user")
-				break
+				return
 			}
 
 			if orderStatus == "canceled" {
 				log.Info("Unknown reason for order cancelation.")
-				break
+				return
 			}
 
 			if orderStatus == "canceled" && order.Reason == "Post only order" {
