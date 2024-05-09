@@ -76,8 +76,6 @@ func BuyBtc(_retry_do_not_use int) {
 	)
 
 	if config.ExperimentalMakerFee {
-		log.Warn("Buying btc with experimental maker fee. This may not work as expected.")
-
 		priceRound, _ := strconv.ParseFloat(fmt.Sprintf("%.1f", fiatPrice), 64)
 		args := map[string]interface{}{
 			// if set to true, no order will be submitted
