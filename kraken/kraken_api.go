@@ -120,14 +120,14 @@ func BuyBtc(_retry_do_not_use int) {
 					return
 				}
 
-				if orderStatus == "canceled" {
-					log.Info("Unknown reason for order cancelation.")
-					return
-				}
-
 				if orderStatus == "canceled" && order.Reason == "Post only order" {
 					log.Info("Order canceled by kraken due to post only order, retrying with new order")
 					BuyBtc(_retry_do_not_use + 1)
+					return
+				}
+
+				if orderStatus == "canceled" {
+					log.Info("Unknown reason for order cancelation.")
 					return
 				}
 
