@@ -58,8 +58,8 @@ func GetCurrentBtcFiatPrice() (float64, error) {
 }
 
 func BuyBtc(_retry_do_not_use int) {
-	if _retry_do_not_use > 3 {
-		log.Error("Failed to buy btc after 3 retries, stop recursion")
+	if _retry_do_not_use > 5 {
+		log.Error("Failed to buy btc after 5 retries, stop recursion")
 		return
 	}
 
@@ -106,41 +106,39 @@ func BuyBtc(_retry_do_not_use int) {
 			}
 
 			order, ok := orderInfo[transactionId]
-			if !ok {
+			if ok {
+				orderStatus := order.Status
+				log.Info("current order status:", orderStatus)
+
+				if orderStatus == "closed" {
+					log.Info("Order successfully executed")
+					break // don't return to send notification and log
+				}
+
+				if orderStatus == "canceled" && order.Reason == "User requested" {
+					log.Info("Order canceled by user")
+					return
+				}
+
+				if orderStatus == "canceled" {
+					log.Info("Unknown reason for order cancelation.")
+					return
+				}
+
+				if orderStatus == "canceled" && order.Reason == "Post only order" {
+					log.Info("Order canceled by kraken due to post only order, retrying with new order")
+					BuyBtc(_retry_do_not_use + 1)
+					return
+				}
+
+				if orderStatus == "expired" {
+					log.Info("Order expired, retrying with new order")
+					BuyBtc(_retry_do_not_use + 1)
+					return
+				}
+			} else {
 				log.Error("Failed to query order status")
-				return
 			}
-
-			orderStatus := order.Status
-			log.Info("current order status:", orderStatus)
-
-			if orderStatus == "closed" {
-				log.Info("Order successfully executed")
-				break // don't return to send notification and log
-			}
-
-			if orderStatus == "canceled" && order.Reason == "User requested" {
-				log.Info("Order canceled by user")
-				return
-			}
-
-			if orderStatus == "canceled" {
-				log.Info("Unknown reason for order cancelation.")
-				return
-			}
-
-			if orderStatus == "canceled" && order.Reason == "Post only order" {
-				log.Info("Order canceled by kraken due to post only order, retrying with new order")
-				BuyBtc(_retry_do_not_use + 1)
-				return
-			}
-
-			if orderStatus == "expired" {
-				log.Info("Order expired, retrying with new order")
-				BuyBtc(_retry_do_not_use + 1)
-				return
-			}
-
 			//wait on pending, open
 			time.Sleep(5 * time.Second)
 		}
