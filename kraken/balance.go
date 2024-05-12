@@ -6,7 +6,7 @@ import (
 	"github.com/primexz/KrakenDCA/config"
 )
 
-func GetFiatBalance() (float64, error) {
+func (k *KrakenApi) GetFiatBalance() (float64, error) {
 	var balanceKey string
 	if config.Currency == "AUD" {
 		balanceKey = "Z"
@@ -14,18 +14,14 @@ func GetFiatBalance() (float64, error) {
 		balanceKey = config.FiatPrefix + config.Currency
 	}
 
-	return getKrakenBalance(balanceKey)
-}
-
-func getKrakenBalance(currency string) (float64, error) {
-	balances, err := getApi().GetAccountBalances()
+	balances, err := k.api.GetAccountBalances()
 	if err != nil {
 		return 0, err
 	}
 
-	balance, ok := balances[currency]
+	balance, ok := balances[balanceKey]
 	if !ok {
-		return 0, fmt.Errorf("no balance found for currency %s", currency)
+		return 0, fmt.Errorf("no balance found for currency %s", balanceKey)
 	}
 
 	ret, _ := balance.Float64()

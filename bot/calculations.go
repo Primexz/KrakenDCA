@@ -17,7 +17,7 @@ func (b *Bot) calculateTimeOfNextOrder() {
 	orderAmountUntilRefill := b.getOrderAmountUntilRefill()
 
 	if orderAmountUntilRefill < 1 {
-		log.Error("Fiat balance is too low to make an order.")
+		b.log.Error("Fiat balance is too low to make an order.")
 		b.timeOfNextOrder = b.timeOfEmptyFiat
 		return
 	}

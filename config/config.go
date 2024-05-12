@@ -22,9 +22,10 @@ var log *logger.Logger
 
 func init() {
 	log = logger.NewLogger("config")
+	loadConfiguration()
 }
 
-func LoadConfiguration() {
+func loadConfiguration() {
 	log.Info("Loading configuration..")
 
 	KrakenPublicKey = loadRequiredEnvVariable("KRAKEN_PUBLIC_KEY")
