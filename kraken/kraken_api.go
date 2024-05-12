@@ -88,8 +88,6 @@ func BuyBtc(_retry_do_not_use int) {
 			"expiretm":    "+240", // close order after 4 minutes
 		}
 
-		log.Debug("Buying btc with price ", args["price"])
-
 		response, krakenErr = getApi().AddOrder("xbt"+strings.ToLower(currency), "buy", "limit", config.KrakenOrderSize, args)
 		if krakenErr != nil {
 			log.Error("Failed to buy btc", krakenErr.Error())
@@ -108,7 +106,7 @@ func BuyBtc(_retry_do_not_use int) {
 			order, ok := orderInfo[transactionId]
 			if ok {
 				orderStatus := order.Status
-				log.Info("current order status:", orderStatus)
+				log.Info("Order status:", orderStatus)
 
 				if orderStatus == "closed" {
 					log.Info("Order successfully executed")
@@ -139,6 +137,7 @@ func BuyBtc(_retry_do_not_use int) {
 			} else {
 				log.Error("Failed to query order status")
 			}
+
 			//wait on pending, open
 			time.Sleep(5 * time.Second)
 		}
