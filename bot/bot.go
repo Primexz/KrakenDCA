@@ -80,7 +80,6 @@ func (b *Bot) run() {
 
 	if b.initialRun {
 		b.calculateTimeOfNextOrder()
-		b.logNextOrder()
 	}
 
 	if (b.timeOfNextOrder.Before(time.Now()) || newFiatMoney) && !b.initialRun {
@@ -88,10 +87,7 @@ func (b *Bot) run() {
 
 		kraken.BuyBtc(0)
 		b.calculateTimeOfNextOrder()
-		b.logNextOrder()
 	}
-}
 
-func (b *Bot) logNextOrder() {
 	log.Info("Next order in", fmtDuration(time.Until(b.timeOfNextOrder)))
 }
