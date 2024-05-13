@@ -21,7 +21,6 @@ func init() {
 
 func main() {
 	log.WithFields(log.Fields{
-		"version": version,
 		"commit":  commit,
 		"runtime": runtime.Version(),
 		"arch":    runtime.GOARCH,
