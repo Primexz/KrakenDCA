@@ -5,7 +5,7 @@ import (
 
 	"github.com/primexz/KrakenDCA/config"
 	"github.com/primexz/KrakenDCA/kraken"
-	"github.com/primexz/KrakenDCA/logger"
+	log "github.com/sirupsen/logrus"
 )
 
 type Bot struct {
@@ -16,15 +16,17 @@ type Bot struct {
 	fiatAmount       float64
 	initialRun       bool
 
-	log       *logger.Logger
+	log       *log.Entry
 	krakenApi *kraken.KrakenApi
 }
 
 func NewBot() *Bot {
 	return &Bot{
 		initialRun: true,
-		log:        logger.NewLogger("bot"),
-		krakenApi:  kraken.NewKrakenApi(),
+		log: log.WithFields(log.Fields{
+			"prefix": "bot",
+		}),
+		krakenApi: kraken.NewKrakenApi(),
 	}
 }
 
@@ -65,7 +67,9 @@ func (b *Bot) run() {
 
 		b.timeOfEmptyFiat = computeNextFiatDepositDay()
 
-		b.log.Info("Next Fiat deposit required at", b.timeOfEmptyFiat)
+		b.log.WithFields(log.Fields{
+			"time": b.timeOfEmptyFiat,
+		}).Info("Next fiat deposit in")
 
 		b.lastFiatBalance = b.fiatAmount
 	}
@@ -88,5 +92,9 @@ func (b *Bot) run() {
 		b.calculateTimeOfNextOrder()
 	}
 
-	b.log.Info("Next order in", fmtDuration(time.Until(b.timeOfNextOrder)))
+	b.log.WithFields(log.Fields{
+		"fiat_balance": b.fiatAmount,
+		"duration":     fmtDuration(time.Until(b.timeOfNextOrder)),
+	}).Info("Next order in")
+
 }

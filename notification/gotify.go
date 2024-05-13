@@ -7,13 +7,15 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/primexz/KrakenDCA/logger"
+	log "github.com/sirupsen/logrus"
 )
 
-var log *logger.Logger
+var logger *log.Entry
 
 func init() {
-	log = logger.NewLogger("gotify")
+	logger = log.WithFields(log.Fields{
+		"prefix": "gotify",
+	})
 }
 
 type GotifyMessage struct {
@@ -27,7 +29,7 @@ func SendPushNotification(title string, messageText string) {
 	rawUrl := os.Getenv("GOTIFY_URL")
 
 	if appToken == "" || rawUrl == "" {
-		log.Debug("Skip sending push notification, not configured")
+		logger.Debug("Skip sending push notification, not configured")
 		return
 	}
 
@@ -49,17 +51,17 @@ func SendPushNotification(title string, messageText string) {
 
 	bodyBytes, err := json.Marshal(message)
 	if err != nil {
-		log.Error(err)
+		logger.Error(err)
 	}
 
 	reader := bytes.NewReader(bodyBytes)
 	rsp, err := http.Post(reqUrl.String(), "application/json", reader)
 
 	if err != nil {
-		log.Error("failed to send push notification", err)
+		logger.Error("failed to send push notification", err)
 	}
 
 	if rsp.StatusCode != 200 {
-		log.Error("failed to send push notification, status code", rsp.StatusCode)
+		logger.Error("failed to send push notification, status code", rsp.StatusCode)
 	}
 }

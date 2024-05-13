@@ -8,13 +8,13 @@ import (
 
 	"github.com/aopoltorzhicky/go_kraken/rest"
 	"github.com/primexz/KrakenDCA/config"
-	"github.com/primexz/KrakenDCA/logger"
+	log "github.com/sirupsen/logrus"
 )
 
 type KrakenApi struct {
 	api *rest.Kraken
 
-	log *logger.Logger
+	log *log.Entry
 }
 
 type KrakenSpread struct {
@@ -26,6 +26,9 @@ type KrakenSpread struct {
 func NewKrakenApi() *KrakenApi {
 	return &KrakenApi{
 		api: rest.New(config.KrakenPublicKey, config.KrakenPrivateKey),
+		log: log.WithFields(log.Fields{
+			"prefix": "kraken",
+		}),
 	}
 }
 

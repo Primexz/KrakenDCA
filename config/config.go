@@ -4,7 +4,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/primexz/KrakenDCA/logger"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -18,15 +18,12 @@ var (
 	ExperimentalMakerFee bool
 )
 
-var log *logger.Logger
+var logger = log.WithFields(log.Fields{
+	"prefix": "bot",
+})
 
-func init() {
-	log = logger.NewLogger("config")
-	loadConfiguration()
-}
-
-func loadConfiguration() {
-	log.Info("Loading configuration..")
+func LoadConfiguration() {
+	logger.Info("Loading configuration..")
 
 	KrakenPublicKey = loadRequiredEnvVariable("KRAKEN_PUBLIC_KEY")
 	KrakenPrivateKey = loadRequiredEnvVariable("KRAKEN_PRIVATE_KEY")
@@ -45,7 +42,7 @@ func loadRequiredEnvVariable(envVar string) string {
 	envData := os.Getenv(envVar)
 
 	if envData == "" {
-		log.Fatal("Required environment variable", envVar, "missing.")
+		logger.WithField("var", envVar).Fatal("Required environment variable missing.")
 	}
 
 	return envData
@@ -68,7 +65,7 @@ func loadFloatEnvVariableWithFallback(envVar string, fallback float64) float64 {
 	} else if s, err := strconv.ParseFloat(envData, 32); err == nil {
 		return s
 	} else {
-		log.Fatal("Failed to parse float environment variable.", envVar)
+		logger.WithField("var", envVar).Fatal("Failed to parse float environment variable.")
 	}
 
 	return fallback
@@ -81,7 +78,11 @@ func loadBoolEnvVariableWithFallback(envVar string, fallback bool) bool {
 	} else if s, err := strconv.ParseBool(envData); err == nil {
 		return s
 	} else {
-		log.Fatal("Failed to parse bool environment variable.", envVar)
+		logger.WithFields(log.Fields{
+			"var": envVar,
+		}).Error("Failed to parse bool environment variable.")
+
+		logger.Fatal("Failed to parse bool environment variable.", envVar)
 	}
 
 	return fallback
