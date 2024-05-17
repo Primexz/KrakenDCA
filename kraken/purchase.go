@@ -29,7 +29,7 @@ func (k *KrakenApi) BuyBtc(_retry_do_not_use int) {
 		krakenErr error
 	)
 
-	if config.ExperimentalMakerFee {
+	if config.LimitOrderMode {
 		priceRound, _ := strconv.ParseFloat(fmt.Sprintf("%.1f", fiatPrice), 64)
 		args := map[string]interface{}{
 			// if set to true, no order will be submitted

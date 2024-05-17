@@ -28,10 +28,6 @@ func main() {
 
 	config.LoadConfiguration()
 
-	if config.ExperimentalMakerFee {
-		log.Warn("Experimental maker fee is enabled. This feature is not recommended for production use.")
-	}
-
 	bot.NewBot().StartBot()
 
 	select {}

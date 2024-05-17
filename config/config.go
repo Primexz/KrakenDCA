@@ -8,14 +8,14 @@ import (
 )
 
 var (
-	KrakenPublicKey      string
-	KrakenPrivateKey     string
-	Currency             string
-	KrakenOrderSize      float64
-	CheckDelay           float64
-	CryptoPrefix         string
-	FiatPrefix           string
-	ExperimentalMakerFee bool
+	KrakenPublicKey  string
+	KrakenPrivateKey string
+	Currency         string
+	KrakenOrderSize  float64
+	CheckDelay       float64
+	CryptoPrefix     string
+	FiatPrefix       string
+	LimitOrderMode   bool
 )
 
 var logger = log.WithFields(log.Fields{
@@ -30,7 +30,7 @@ func LoadConfiguration() {
 	Currency = loadFallbackEnvVariable("CURRENCY", "USD")
 	KrakenOrderSize = loadFloatEnvVariableWithFallback("KRAKEN_ORDER_SIZE", 0.0001) // https://support.kraken.com/hc/en-us/articles/205893708-Minimum-order-size-volume-for-trading
 	CheckDelay = loadFloatEnvVariableWithFallback("CHECK_DELAY", 60)
-	ExperimentalMakerFee = loadBoolEnvVariableWithFallback("EXPERIMENTAL_MAKER_FEE", false)
+	LimitOrderMode = loadBoolEnvVariableWithFallback("LIMIT_ORDER_MODE", false)
 
 	if Currency == "USD" || Currency == "EUR" || Currency == "GBP" {
 		CryptoPrefix = "X"
