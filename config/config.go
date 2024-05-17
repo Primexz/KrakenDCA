@@ -15,7 +15,9 @@ var (
 	CheckDelay       float64
 	CryptoPrefix     string
 	FiatPrefix       string
-	LimitOrderMode   bool
+
+	LimitOrderMode       bool
+	LimitOrderRetryCount int
 )
 
 var logger = log.WithFields(log.Fields{
@@ -31,6 +33,7 @@ func LoadConfiguration() {
 	KrakenOrderSize = loadFloatEnvVariableWithFallback("KRAKEN_ORDER_SIZE", 0.0001) // https://support.kraken.com/hc/en-us/articles/205893708-Minimum-order-size-volume-for-trading
 	CheckDelay = loadFloatEnvVariableWithFallback("CHECK_DELAY", 60)
 	LimitOrderMode = loadBoolEnvVariableWithFallback("LIMIT_ORDER_MODE", false)
+	LimitOrderRetryCount = int(loadFloatEnvVariableWithFallback("LIMIT_ORDER_RETRY_COUNT", 8))
 
 	if Currency == "USD" || Currency == "EUR" || Currency == "GBP" {
 		CryptoPrefix = "X"
