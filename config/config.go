@@ -18,6 +18,8 @@ var (
 
 	LimitOrderMode       bool
 	LimitOrderRetryCount int
+
+	MetricPort int
 )
 
 var logger = log.WithFields(log.Fields{
@@ -34,6 +36,8 @@ func LoadConfiguration() {
 	CheckDelay = loadFloatEnvVariableWithFallback("CHECK_DELAY", 60)
 	LimitOrderMode = loadBoolEnvVariableWithFallback("LIMIT_ORDER_MODE", false)
 	LimitOrderRetryCount = int(loadFloatEnvVariableWithFallback("LIMIT_ORDER_RETRY_COUNT", 8))
+
+	MetricPort = int(loadFloatEnvVariableWithFallback("METRIC_PORT", 3000))
 
 	if Currency == "USD" || Currency == "EUR" || Currency == "GBP" {
 		CryptoPrefix = "X"

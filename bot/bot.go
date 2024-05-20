@@ -5,6 +5,7 @@ import (
 
 	"github.com/primexz/KrakenDCA/config"
 	"github.com/primexz/KrakenDCA/kraken"
+	"github.com/primexz/KrakenDCA/metrics"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -92,9 +93,14 @@ func (b *Bot) run() {
 		b.calculateTimeOfNextOrder()
 	}
 
+	b.updateMetrics()
+
 	b.log.WithFields(log.Fields{
 		"fiat_balance": b.fiatAmount,
 		"duration":     fmtDuration(time.Until(b.timeOfNextOrder)),
 	}).Info("Next order in")
+}
 
+func (b *Bot) updateMetrics() {
+	metrics.Metrics.NextOrder = b.timeOfNextOrder.Unix()
 }

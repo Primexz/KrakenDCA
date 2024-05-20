@@ -5,6 +5,7 @@ import (
 
 	"github.com/primexz/KrakenDCA/bot"
 	"github.com/primexz/KrakenDCA/config"
+	"github.com/primexz/KrakenDCA/metrics"
 	log "github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 )
@@ -27,6 +28,7 @@ func main() {
 	}).Infof("Kraken DCA 🐙 %s", version)
 
 	config.LoadConfiguration()
+	metrics.StartServer()
 
 	bot.NewBot().StartBot()
 
