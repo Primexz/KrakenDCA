@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/primexz/KrakenDCA/config"
 	log "github.com/sirupsen/logrus"
@@ -31,9 +32,18 @@ func StartServer() {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 
-			json.NewEncoder(w).Encode(Metrics)
+			if err := json.NewEncoder(w).Encode(Metrics); err != nil {
+				logger.WithError(err).Error("Failed to encode metrics.")
+			}
 		})
 
-		http.ListenAndServe(":"+strconv.Itoa(port), nil)
+		server := &http.Server{
+			Addr:              ":" + strconv.Itoa(port),
+			ReadHeaderTimeout: 3 * time.Second,
+		}
+
+		if err := server.ListenAndServe(); err != nil {
+			logger.WithError(err).Error("Failed to start metrics server.")
+		}
 	}()
 }
