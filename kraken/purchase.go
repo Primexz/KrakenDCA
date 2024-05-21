@@ -10,17 +10,32 @@ import (
 	"github.com/primexz/KrakenDCA/notification"
 )
 
+type LimitPurchaseAction int32
+
+const (
+	NOTHING                   LimitPurchaseAction = 0
+	INCREASE_LIMIT_ADJUSTMENT LimitPurchaseAction = 1
+)
+
 func (k *KrakenApi) BuyBtc() {
 	if config.LimitOrderMode {
+		limitAdjustment := 0.0
+
 		for i := 0; i < config.LimitOrderRetryCount; i++ {
 			fiatPrice, err := k.GetCurrentBtcFiatPrice()
 			if err != nil {
 				k.log.Error("Failed to get current btc price", err)
 			}
 
-			if k.placeLimitOrder(fiatPrice) {
+			success, action := k.placeLimitOrder(fiatPrice, limitAdjustment)
+			if success {
 				k.log.Info("Successfully bought limit btc")
 				return
+			}
+
+			if action == INCREASE_LIMIT_ADJUSTMENT {
+				limitAdjustment += 0.1
+				k.log.WithField("limitAdjustment", limitAdjustment).Warn("Increasing limit adjustment")
 			}
 
 			k.log.Warn("Retrying to place limit order")
@@ -49,14 +64,15 @@ func (k *KrakenApi) placeMarketOrder() bool {
 // placeLimitOrder places a limit order on kraken
 // returns true if order was successfully placed
 // returns false if order was not placed and should be retried
-func (k *KrakenApi) placeLimitOrder(fiatPrice float64) bool {
+func (k *KrakenApi) placeLimitOrder(fiatPrice float64, limitAdjustment float64) (bool, LimitPurchaseAction) {
 	priceRound, _ := strconv.ParseFloat(fmt.Sprintf("%.1f", fiatPrice), 64)
+
 	args := map[string]interface{}{
 		// if set to true, no order will be submitted
 		"validate": false,
 
 		//price can only be specified up to 1 decimals
-		"price":       priceRound - 0.1,
+		"price":       priceRound - limitAdjustment,
 		"oflags":      "post",
 		"timeinforce": "GTD",
 		"expiretm":    "+240", // close order after 4 minutes
@@ -65,7 +81,7 @@ func (k *KrakenApi) placeLimitOrder(fiatPrice float64) bool {
 	response, err := k.api.AddOrder("xbt"+strings.ToLower(config.Currency), "buy", "limit", config.KrakenOrderSize, args)
 	if err != nil {
 		k.log.Error("Failed to buy btc", err)
-		return false
+		return false, NOTHING
 	}
 
 	transactionId := response.TransactionIds[0]
@@ -74,7 +90,7 @@ func (k *KrakenApi) placeLimitOrder(fiatPrice float64) bool {
 		orderInfo, err := k.api.QueryOrders(true, "", transactionId)
 		if err != nil {
 			k.log.Error("Failed to get order status", err.Error())
-			return false
+			return false, NOTHING
 		}
 
 		order, ok := orderInfo[transactionId]
@@ -89,22 +105,24 @@ func (k *KrakenApi) placeLimitOrder(fiatPrice float64) bool {
 
 			if orderStatus == "canceled" && order.Reason == "User requested" {
 				k.log.Info("Order canceled by user")
-				return true
+				return true, NOTHING
 			}
 
 			if orderStatus == "canceled" && order.Reason == "Post only order" {
 				k.log.Info("Order canceled by kraken due to post only order, retrying with new order")
-				return false
+
+				// This happens when the price drops too fast, return the action type to increase the limit adjustment
+				return false, INCREASE_LIMIT_ADJUSTMENT
 			}
 
 			if orderStatus == "canceled" {
 				k.log.Info("Unknown reason for order cancelation.")
-				return true
+				return true, NOTHING
 			}
 
 			if orderStatus == "expired" {
 				k.log.Info("Order expired, retrying with new order")
-				return false
+				return false, NOTHING
 			}
 		} else {
 			k.log.Error("Failed to query order status")
@@ -114,5 +132,5 @@ func (k *KrakenApi) placeLimitOrder(fiatPrice float64) bool {
 		time.Sleep(5 * time.Second)
 	}
 
-	return true
+	return true, NOTHING
 }
