@@ -10,13 +10,6 @@ import (
 	"github.com/primexz/KrakenDCA/notification"
 )
 
-type LimitPurchaseAction int32
-
-const (
-	NOTHING                   LimitPurchaseAction = 0
-	INCREASE_LIMIT_ADJUSTMENT LimitPurchaseAction = 1
-)
-
 func (k *KrakenApi) BuyBtc() {
 	if config.LimitOrderMode {
 		limitAdjustment := 0.0
