@@ -74,7 +74,7 @@ func (k *KrakenApi) placeLimitOrder(fiatPrice float64, limitAdjustment float64) 
 	response, err := k.api.AddOrder("xbt"+strings.ToLower(config.Currency), "buy", "limit", config.KrakenOrderSize, args)
 	if err != nil {
 		k.log.Error("Failed to buy btc", err)
-		return false, NOTHING
+		return false, NONE
 	}
 
 	transactionId := response.TransactionIds[0]
@@ -83,7 +83,7 @@ func (k *KrakenApi) placeLimitOrder(fiatPrice float64, limitAdjustment float64) 
 		orderInfo, err := k.api.QueryOrders(true, "", transactionId)
 		if err != nil {
 			k.log.Error("Failed to get order status", err.Error())
-			return false, NOTHING
+			return false, NONE
 		}
 
 		order, ok := orderInfo[transactionId]
@@ -98,7 +98,7 @@ func (k *KrakenApi) placeLimitOrder(fiatPrice float64, limitAdjustment float64) 
 
 			if orderStatus == "canceled" && order.Reason == "User requested" {
 				k.log.Info("Order canceled by user")
-				return true, NOTHING
+				return true, NONE
 			}
 
 			if orderStatus == "canceled" && order.Reason == "Post only order" {
@@ -110,12 +110,12 @@ func (k *KrakenApi) placeLimitOrder(fiatPrice float64, limitAdjustment float64) 
 
 			if orderStatus == "canceled" {
 				k.log.Info("Unknown reason for order cancelation.")
-				return true, NOTHING
+				return true, NONE
 			}
 
 			if orderStatus == "expired" {
 				k.log.Info("Order expired, retrying with new order")
-				return false, NOTHING
+				return false, NONE
 			}
 		} else {
 			k.log.Error("Failed to query order status")
@@ -125,5 +125,5 @@ func (k *KrakenApi) placeLimitOrder(fiatPrice float64, limitAdjustment float64) 
 		time.Sleep(5 * time.Second)
 	}
 
-	return true, NOTHING
+	return true, NONE
 }
