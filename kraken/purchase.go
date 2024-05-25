@@ -12,7 +12,7 @@ import (
 
 func (k *KrakenApi) BuyBtc() {
 	if config.LimitOrderMode {
-		limitAdjustment := 0.0
+		limitAdjustment := 0.1
 
 		for i := 0; i < config.LimitOrderRetryCount; i++ {
 			fiatPrice, err := k.GetCurrentBtcFiatPrice()
