@@ -29,5 +29,5 @@ func (b *Bot) calculateTimeOfNextOrder() {
 func (b *Bot) getOrderAmountUntilRefill() float64 {
 	fiatValueInBtc := b.fiatAmount / b.lastBtcFiatPrice
 
-	return fiatValueInBtc / config.KrakenOrderSize
+	return fiatValueInBtc / config.C.KrakenOrderSize
 }

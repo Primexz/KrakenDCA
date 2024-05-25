@@ -11,10 +11,10 @@ import (
 )
 
 func (k *KrakenApi) BuyBtc() {
-	if config.LimitOrderMode {
+	if config.C.LimitOrderMode {
 		limitAdjustment := 0.1
 
-		for i := 0; i < config.LimitOrderRetryCount; i++ {
+		for i := 0; i < config.C.LimitOrderRetryCount; i++ {
 			fiatPrice, err := k.GetCurrentBtcFiatPrice()
 			if err != nil {
 				k.log.Error("Failed to get current btc price", err)
@@ -34,8 +34,8 @@ func (k *KrakenApi) BuyBtc() {
 			k.log.Warn("Retrying to place limit order")
 		}
 
-		notification.SendPushNotification("Failed to buy btc", fmt.Sprintf("Failed to buy btc after %d retries", config.LimitOrderRetryCount))
-		k.log.Errorf("Failed to buy btc after %d retries", config.LimitOrderRetryCount)
+		notification.SendPushNotification("Failed to buy btc", fmt.Sprintf("Failed to buy btc after %d retries", config.C.LimitOrderRetryCount))
+		k.log.Errorf("Failed to buy btc after %d retries", config.C.LimitOrderRetryCount)
 	} else {
 		if !k.placeMarketOrder() {
 			notification.SendPushNotification("Failed to buy btc", "Failed to buy btc")
@@ -46,7 +46,7 @@ func (k *KrakenApi) BuyBtc() {
 
 // placeMarketOrder places a market order on kraken
 func (k *KrakenApi) placeMarketOrder() bool {
-	if _, err := k.api.AddOrder("xbt"+strings.ToLower(config.Currency), "buy", "market", config.KrakenOrderSize, nil); err != nil {
+	if _, err := k.api.AddOrder("xbt"+strings.ToLower(config.C.Currency), "buy", "market", config.C.KrakenOrderSize, nil); err != nil {
 		k.log.Error("Failed to buy btc", err.Error())
 		return false
 	}
@@ -71,7 +71,7 @@ func (k *KrakenApi) placeLimitOrder(fiatPrice float64, limitAdjustment float64) 
 		"expiretm":    "+240", // close order after 4 minutes
 	}
 
-	response, err := k.api.AddOrder("xbt"+strings.ToLower(config.Currency), "buy", "limit", config.KrakenOrderSize, args)
+	response, err := k.api.AddOrder("xbt"+strings.ToLower(config.C.Currency), "buy", "limit", config.C.KrakenOrderSize, args)
 	if err != nil {
 		k.log.Error("Failed to buy btc", err)
 		return false, NONE

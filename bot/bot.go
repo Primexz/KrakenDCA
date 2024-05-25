@@ -39,7 +39,7 @@ func (b *Bot) StartBot() {
 			b.run()
 
 			b.initialRun = false
-			time.Sleep(time.Duration(config.CheckDelay) * time.Second)
+			time.Sleep(time.Duration(config.C.CheckDelay) * time.Second)
 		}
 
 	}()

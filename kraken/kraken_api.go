@@ -25,7 +25,7 @@ type KrakenSpread struct {
 
 func NewKrakenApi() *KrakenApi {
 	return &KrakenApi{
-		api: rest.New(config.KrakenPublicKey, config.KrakenPrivateKey),
+		api: rest.New(config.C.KrakenPublicKey, config.C.KrakenPrivateKey),
 		log: log.WithFields(log.Fields{
 			"prefix": "kraken",
 		}),
@@ -33,7 +33,7 @@ func NewKrakenApi() *KrakenApi {
 }
 
 func (k *KrakenApi) GetCurrentBtcFiatPrice() (float64, error) {
-	cryptoName := config.CryptoPrefix + "XBT" + config.FiatPrefix + config.Currency
+	cryptoName := config.C.CryptoPrefix + "XBT" + config.C.FiatPrefix + config.C.Currency
 
 	resp, err := http.Get("https://api.kraken.com/0/public/Spread?pair=" + cryptoName)
 	if err != nil {

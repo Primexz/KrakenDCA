@@ -24,7 +24,7 @@ var (
 
 func StartServer() {
 	go func() {
-		port := config.MetricPort
+		port := config.C.MetricPort
 
 		logger.WithField("port", port).Info("Starting Prometheus metrics server started.")
 

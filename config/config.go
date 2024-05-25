@@ -1,96 +1,44 @@
 package config
 
 import (
-	"os"
-	"strconv"
-
+	"github.com/caarlos0/env/v11"
 	log "github.com/sirupsen/logrus"
 )
 
+type config struct {
+	KrakenPublicKey      string  `env:"KRAKEN_PUBLIC_KEY,required"`
+	KrakenPrivateKey     string  `env:"KRAKEN_PRIVATE_KEY,required"`
+	Currency             string  `env:"CURRENCY" envDefault:"USD"`
+	KrakenOrderSize      float64 `env:"KRAKEN_ORDER_SIZE" envDefault:"0.0001"`
+	CheckDelay           float64 `env:"CHECK_DELAY" envDefault:"60"`
+	LimitOrderMode       bool    `env:"LIMIT_ORDER_MODE" envDefault:"false"`
+	LimitOrderRetryCount int     `env:"LIMIT_ORDER_RETRY_COUNT" envDefault:"8"`
+	MetricPort           int     `env:"METRIC_PORT" envDefault:"3000"`
+
+	CryptoPrefix string
+	FiatPrefix   string
+}
+
 var (
-	KrakenPublicKey  string
-	KrakenPrivateKey string
-	Currency         string
-	KrakenOrderSize  float64
-	CheckDelay       float64
-	CryptoPrefix     string
-	FiatPrefix       string
-
-	LimitOrderMode       bool
-	LimitOrderRetryCount int
-
-	MetricPort int
+	logger = log.WithFields(log.Fields{
+		"prefix": "bot",
+	})
+	C config
 )
 
-var logger = log.WithFields(log.Fields{
-	"prefix": "bot",
-})
-
-func LoadConfiguration() {
-	logger.Info("Loading configuration..")
-
-	KrakenPublicKey = loadRequiredEnvVariable("KRAKEN_PUBLIC_KEY")
-	KrakenPrivateKey = loadRequiredEnvVariable("KRAKEN_PRIVATE_KEY")
-	Currency = loadFallbackEnvVariable("CURRENCY", "USD")
-	KrakenOrderSize = loadFloatEnvVariableWithFallback("KRAKEN_ORDER_SIZE", 0.0001) // https://support.kraken.com/hc/en-us/articles/205893708-Minimum-order-size-volume-for-trading
-	CheckDelay = loadFloatEnvVariableWithFallback("CHECK_DELAY", 60)
-	LimitOrderMode = loadBoolEnvVariableWithFallback("LIMIT_ORDER_MODE", false)
-	LimitOrderRetryCount = int(loadFloatEnvVariableWithFallback("LIMIT_ORDER_RETRY_COUNT", 8))
-
-	MetricPort = int(loadFloatEnvVariableWithFallback("METRIC_PORT", 3000))
-
-	if Currency == "USD" || Currency == "EUR" || Currency == "GBP" {
-		CryptoPrefix = "X"
-		FiatPrefix = "Z"
-	}
+func init() {
+	loadConfiguration()
 }
 
-func loadRequiredEnvVariable(envVar string) string {
-	envData := os.Getenv(envVar)
-
-	if envData == "" {
-		logger.WithField("var", envVar).Fatal("Required environment variable missing.")
-	}
-
-	return envData
-}
-
-func loadFallbackEnvVariable(envVar string, fallback string) string {
-	envData := os.Getenv(envVar)
-
-	if envData == "" {
-		envData = fallback
-	}
-
-	return envData
-}
-
-func loadFloatEnvVariableWithFallback(envVar string, fallback float64) float64 {
-	envData := os.Getenv(envVar)
-
-	if envData == "" {
-	} else if s, err := strconv.ParseFloat(envData, 32); err == nil {
-		return s
+func loadConfiguration() {
+	if config, err := env.ParseAs[config](); err == nil {
+		C = config
 	} else {
-		logger.WithField("var", envVar).Fatal("Failed to parse float environment variable.")
+		logger.Fatal(err)
 	}
 
-	return fallback
-}
-
-func loadBoolEnvVariableWithFallback(envVar string, fallback bool) bool {
-	envData := os.Getenv(envVar)
-
-	if envData == "" {
-	} else if s, err := strconv.ParseBool(envData); err == nil {
-		return s
-	} else {
-		logger.WithFields(log.Fields{
-			"var": envVar,
-		}).Error("Failed to parse bool environment variable.")
-
-		logger.Fatal("Failed to parse bool environment variable.", envVar)
+	if C.Currency == "USD" || C.Currency == "EUR" || C.Currency == "GBP" {
+		C.CryptoPrefix = "X"
+		C.FiatPrefix = "Z"
 	}
-
-	return fallback
 }

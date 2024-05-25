@@ -8,10 +8,10 @@ import (
 
 func (k *KrakenApi) GetFiatBalance() (float64, error) {
 	var balanceKey string
-	if config.Currency == "AUD" {
+	if config.C.Currency == "AUD" {
 		balanceKey = "Z"
 	} else {
-		balanceKey = config.FiatPrefix + config.Currency
+		balanceKey = config.C.FiatPrefix + config.C.Currency
 	}
 
 	balances, err := k.api.GetAccountBalances()
