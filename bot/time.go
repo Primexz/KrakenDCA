@@ -5,10 +5,6 @@ import (
 	"time"
 )
 
-func addMonthsToTime(months int, time time.Time) time.Time {
-	return time.AddDate(0, months, 0)
-}
-
 func fmtDuration(d time.Duration) string {
 	hour := int(d.Hours())
 	minute := int(d.Minutes()) % 60

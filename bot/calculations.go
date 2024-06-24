@@ -7,10 +7,18 @@ import (
 )
 
 func computeNextFiatDepositDay() time.Time {
-	date := addMonthsToTime(1, time.Now())
+	now := time.Now()
 
-	//get the first day of the month
-	return date.AddDate(0, 0, -date.Day()+1)
+	year := now.Year()
+	month := now.Month() + 1
+
+	if month > 12 {
+		month = 1
+		year++
+	}
+
+	firstOfNextMonth := time.Date(year, month, 1, 0, 0, 0, 0, time.Local)
+	return firstOfNextMonth
 }
 
 func (b *Bot) calculateTimeOfNextOrder() {
