@@ -32,17 +32,14 @@ func NewBot() *Bot {
 }
 
 func (b *Bot) StartBot() {
-	go func() {
-		b.log.Info("Starting bot")
+	b.log.Info("Starting bot")
 
-		for {
-			b.run()
+	for {
+		b.run()
 
-			b.initialRun = false
-			time.Sleep(time.Duration(config.C.CheckDelay) * time.Second)
-		}
-
-	}()
+		b.initialRun = false
+		time.Sleep(time.Duration(config.C.CheckDelay) * time.Second)
+	}
 }
 
 func (b *Bot) run() {

@@ -30,6 +30,4 @@ func main() {
 	metrics.StartServer()
 
 	bot.NewBot().StartBot()
-
-	select {}
 }
