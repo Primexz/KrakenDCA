@@ -30,7 +30,8 @@ func (k *KrakenApi) BuyBtc() {
 				return
 			}
 
-			if action == INCREASE_LIMIT_ADJUSTMENT {
+			switch action {
+			case INCREASE_LIMIT_ADJUSTMENT:
 				limitAdjustment += 0.1
 				k.log.WithField("limitAdjustment", limitAdjustment).Warn("Increasing limit adjustment")
 			}
