@@ -10,6 +10,10 @@ import (
 	"github.com/primexz/KrakenDCA/notification"
 )
 
+var (
+	assetPair = "xbt" + strings.ToLower(config.C.Currency)
+)
+
 func (k *KrakenApi) BuyBtc() {
 	if config.C.LimitOrderMode {
 		limitAdjustment := 0.1
@@ -46,7 +50,7 @@ func (k *KrakenApi) BuyBtc() {
 
 // placeMarketOrder places a market order on kraken
 func (k *KrakenApi) placeMarketOrder() bool {
-	if _, err := k.api.AddOrder("xbt"+strings.ToLower(config.C.Currency), "buy", "market", config.C.KrakenOrderSize, nil); err != nil {
+	if _, err := k.api.AddOrder(assetPair, "buy", "market", config.C.KrakenOrderSize, nil); err != nil {
 		k.log.Error("Failed to buy btc", err.Error())
 		return false
 	}
@@ -71,7 +75,7 @@ func (k *KrakenApi) placeLimitOrder(fiatPrice float64, limitAdjustment float64) 
 		"expiretm":    "+240", // close order after 4 minutes
 	}
 
-	response, err := k.api.AddOrder("xbt"+strings.ToLower(config.C.Currency), "buy", "limit", config.C.KrakenOrderSize, args)
+	response, err := k.api.AddOrder(assetPair, "buy", "limit", config.C.KrakenOrderSize, args)
 	if err != nil {
 		k.log.Error("Failed to buy btc", err)
 		return false, NONE
