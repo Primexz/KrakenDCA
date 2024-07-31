@@ -43,10 +43,7 @@ func (b *Bot) StartBot() {
 }
 
 func (b *Bot) run() {
-	if fiatAmnt, err := b.krakenApi.GetFiatBalance(); err == nil {
-		b.fiatAmount = fiatAmnt
-	} else {
-		b.log.Error("Error getting fiat balance: ", err)
+	if err := b.updateFiatBalance(); err != nil {
 		return
 	}
 
@@ -87,6 +84,11 @@ func (b *Bot) run() {
 		b.log.Info("Placing bitcoin purchase order. ₿")
 
 		b.krakenApi.BuyBtc()
+
+		if err := b.updateFiatBalance(); err != nil {
+			return
+		}
+
 		b.calculateTimeOfNextOrder()
 	}
 
@@ -96,6 +98,16 @@ func (b *Bot) run() {
 		"fiat_balance": b.fiatAmount,
 		"duration":     fmtDuration(time.Until(b.timeOfNextOrder)),
 	}).Info("Next order in")
+}
+
+func (b *Bot) updateFiatBalance() error {
+	if fiatAmnt, err := b.krakenApi.GetFiatBalance(); err == nil {
+		b.fiatAmount = fiatAmnt
+		return nil
+	} else {
+		b.log.Error("Error getting fiat balance: ", err)
+		return err
+	}
 }
 
 func (b *Bot) updateMetrics() {
