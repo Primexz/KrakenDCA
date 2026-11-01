@@ -6,14 +6,15 @@ import (
 )
 
 type config struct {
-	KrakenPublicKey      string  `env:"KRAKEN_PUBLIC_KEY,required"`
-	KrakenPrivateKey     string  `env:"KRAKEN_PRIVATE_KEY,required"`
-	Currency             string  `env:"CURRENCY" envDefault:"USD"`
-	KrakenOrderSize      float64 `env:"KRAKEN_ORDER_SIZE" envDefault:"0.00006"`
-	CheckDelay           float64 `env:"CHECK_DELAY" envDefault:"60"`
-	LimitOrderMode       bool    `env:"LIMIT_ORDER_MODE" envDefault:"false"`
-	LimitOrderRetryCount int     `env:"LIMIT_ORDER_RETRY_COUNT" envDefault:"8"`
-	MetricPort           int     `env:"METRIC_PORT" envDefault:"3000"`
+	KrakenPublicKey          string  `env:"KRAKEN_PUBLIC_KEY,required"`
+	KrakenPrivateKey         string  `env:"KRAKEN_PRIVATE_KEY,required"`
+	Currency                 string  `env:"CURRENCY" envDefault:"USD"`
+	KrakenOrderSize          float64 `env:"KRAKEN_ORDER_SIZE" envDefault:"0.00006"`
+	CheckDelay               float64 `env:"CHECK_DELAY" envDefault:"60"`
+	LimitOrderMode           bool    `env:"LIMIT_ORDER_MODE" envDefault:"true"`
+	LimitOrderRetryCount     int     `env:"LIMIT_ORDER_RETRY_COUNT" envDefault:"8"`
+	LimitOrderMarketFallback bool    `env:"LIMIT_ORDER_MARKET_FALLBACK" envDefault:"false"`
+	MetricPort               int     `env:"METRIC_PORT" envDefault:"3000"`
 
 	CryptoPrefix string
 	FiatPrefix   string

@@ -34,6 +34,14 @@ func NewBot() *Bot {
 func (b *Bot) StartBot() {
 	b.log.Info("Starting bot")
 
+	if config.C.LimitOrderMode {
+		if err := b.krakenApi.ValidatePostOnlyOrder(); err != nil {
+			b.log.Error("Kraken rejected the post-only test order, purchases will likely fail: ", err)
+		}
+	} else {
+		b.log.Warn("LIMIT_ORDER_MODE is disabled, market orders always pay the taker fee")
+	}
+
 	for {
 		b.run()
 

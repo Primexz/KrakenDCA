@@ -54,7 +54,7 @@ func (k *KrakenApi) GetCurrentBtcFiatPrice() (float64, error) {
 	latestPrices := prices[len(prices)-1].([]interface{})
 	currentPrice := latestPrices[len(latestPrices)-1]
 
-	parsedPrice, err := strconv.ParseFloat(currentPrice.(string), 32)
+	parsedPrice, err := strconv.ParseFloat(currentPrice.(string), 64)
 	if err != nil {
 		return 0, err
 	}
