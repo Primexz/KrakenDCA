@@ -25,7 +25,7 @@ Since Kraken has extremely high fees for its crypto savings plan, this tool was 
 
 Bitcoin orders are placed as often as possible. To illustrate the behaviour in more detail, let's look at the following example:
 You deposit €500 per month on Kraken-Pro.
-The bot calculates how often you can buy Bitcoin this month, as Kraken has a minimum purchase limit of 0.0001 BTC. Your orders are executed as often as possible throughout the month, thereby achieving dollar-cost averaging.
+The bot calculates how often you can buy Bitcoin this month, as Kraken has a minimum purchase limit of 0.00006 BTC. Your orders are executed as often as possible throughout the month, thereby achieving dollar-cost averaging.
 
 ## ⚙️ Configuration
 
@@ -36,8 +36,8 @@ This tool is configured via environment variables. Some environment variables ar
 | --- | --- | --- | --- |
 | `KRAKEN_PUBLIC_KEY` | Your Kraken API public key | ✅ | |
 | `KRAKEN_PRIVATE_KEY` | Your Kraken API private key | ✅ | |
-| `CURRENCY` | Your fiat currency to be used, e.g. USD or EUR | ❌  | `USD` |
-| `KRAKEN_ORDER_SIZE` | The order size to be used. This value should only be edited if you know exactly what you are doing. | ❌ | `0.0001` |
+| `CURRENCY` | Your fiat currency to be used, e.g. USD, EUR or CHF | ❌  | `USD` |
+| `KRAKEN_ORDER_SIZE` | The order size to be used. This value should only be edited if you know exactly what you are doing. | ❌ | `0.00006` |
 | `LIMIT_ORDER_MODE` | If set to true, limit orders are placed. With a normal monthly volume, you only pay 0.25% fees per purchase instead of 0.4%. | ❌ | `false` |
 | `CHECK_DELAY` | How often the algorithm should be executed, in seconds. | ❌ | `60` |
 | `GOTIFY_URL` | URL to your Gotify server | ❌ |  |
