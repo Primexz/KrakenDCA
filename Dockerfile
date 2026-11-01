@@ -13,7 +13,7 @@ RUN go mod download
 # Build the binary with commit hash and build date
 RUN COMMIT=$(git rev-parse --short HEAD || echo none) && \
     DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ) && \
-    go build -ldflags "-X main.Commit=$COMMIT -X main.BuildDate=$DATE" -o kraken-dca .
+    go build -ldflags "-X main.commit=$COMMIT -X main.date=$DATE" -o kraken-dca .
 
 # Step 2: Minimal runtime
 FROM alpine
