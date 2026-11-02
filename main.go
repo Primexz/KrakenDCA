@@ -25,7 +25,7 @@ func main() {
 		"commit":  commit,
 		"runtime": runtime.Version(),
 		"arch":    runtime.GOARCH,
-	}).Infof("Kraken DCA 🐙 %s", version)
+	}).Infof("Kraken DCA 🐙 %s modded by Jag", version)
 
 	metrics.StartServer()
 
