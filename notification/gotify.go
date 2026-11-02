@@ -6,11 +6,16 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 )
 
-var logger *log.Entry
+var (
+	logger *log.Entry
+
+	httpClient = &http.Client{Timeout: 10 * time.Second}
+)
 
 func init() {
 	logger = log.WithFields(log.Fields{
@@ -51,17 +56,18 @@ func SendPushNotification(title string, messageText string) {
 
 	bodyBytes, err := json.Marshal(message)
 	if err != nil {
-		logger.Error(err)
+		logger.Error("failed to encode push notification: ", err)
+		return
 	}
 
-	reader := bytes.NewReader(bodyBytes)
-	rsp, err := http.Post(reqUrl.String(), "application/json", reader)
-
+	rsp, err := httpClient.Post(reqUrl.String(), "application/json", bytes.NewReader(bodyBytes))
 	if err != nil {
-		logger.Error("failed to send push notification", err)
+		logger.Error("failed to send push notification: ", err)
+		return
 	}
+	defer rsp.Body.Close()
 
-	if rsp.StatusCode != 200 {
-		logger.Error("failed to send push notification, status code", rsp.StatusCode)
+	if rsp.StatusCode != http.StatusOK {
+		logger.Error("failed to send push notification, status code ", rsp.StatusCode)
 	}
 }
